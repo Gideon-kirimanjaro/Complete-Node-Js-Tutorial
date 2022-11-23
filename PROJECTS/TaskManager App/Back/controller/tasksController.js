@@ -1,63 +1,54 @@
 const crypto = require("crypto");
 const { tasks } = require("../database/tasks");
-const getTasks = (req, res) => {
-  res.json(tasks);
-};
-const postTasks = (req, res) => {
-  const id = crypto.randomBytes(16).toString("hex");
-  tasks.push({ ...req.body, completed: false, id: id });
-  res.status(200).json(tasks);
-};
-const getTask = (req, res) => {
-  const { key } = req.params;
-  const exists = tasks.find((item) => {
-    return item.id === key;
-  });
-  if (exists) {
-    const task = tasks.filter((item) => {
-      return item.id === key;
+const Tasks = require("../model/tasks");
+const getTasks = async (req, res) => {
+  try {
+    const allTasks = await Tasks.find({});
+    res.status(200).json(allTasks);
+  } catch (error) {
+    res.status(501).json({
+      msg: error,
     });
-    return res.json(task);
-  } else {
-    res.json("Item does not exist");
   }
-
-  // tasks.find((item) => {
-  //   if (item.id === Number(key)) {
-  //     res.json(item);
-  //   } else if (item.id !== Number(key)) {
-  //     res.send("Key does not exist");
-  //   }
-  // });
 };
-const updateTask = (req, res) => {
+const postTasks = async (req, res) => {
+  try {
+    const postedTask = await Tasks.create(req.body);
+    res.status(201).json(postedTask);
+  } catch (error) {
+    res.status(501).json({ msg: error });
+  }
+};
+const getTask = async (req, res) => {
+  const { key } = req.params;
+  try {
+    const oneTask = await Tasks.findOne({ _id: key });
+    if (!oneTask) {
+      return res
+        .status(404)
+        .json({ msg: `Item with id ${key} does not exist` });
+    }
+    return res.status(200).json(oneTask);
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+};
+const updateTask = async (req, res) => {
   const { key } = req.params;
   const { taskName, taskTime, completed } = req.body;
-  const exists = tasks.find((item) => {
-    return item.id === key;
-  });
-  if (exists) {
-    tasks.find((item) => {
-      if (item.id === key) {
-        item.taskName = taskName;
-        item.taskTime = taskTime;
-        item.completed = completed;
-        return res.json(tasks);
-      }
+  try {
+    await Tasks.updateOne({
+      taskName: taskName,
+      taskTime: taskTime,
+      completed: completed,
     });
-  } else {
-    res.json("Item does not exist");
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
   }
-
-  tasks.find((item) => {
-    if (item.id === key) {
-      item.taskName = taskName;
-      item.taskTime = taskTime;
-      return res.json(tasks);
-    } else {
-      res.json("Item does not exist");
-    }
-  });
 };
 const deleteTask = (req, res) => {
   const { key } = req.params;

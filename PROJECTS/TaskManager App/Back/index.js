@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const { connectToDb } = require("./database/connect");
 const cors = require("cors");
 const { router } = require("./router/tasksRouter");
+const { config } = require("dotenv");
+config();
 const PORT = 4500 || process.env.PORT;
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -33,6 +36,15 @@ app.use("/api/tasks", router);
 app.get("/", (req, res) => {
   res.send("SERVER RUNNING");
 });
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await connectToDb(process.env.MONGO_URL);
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch {
+    console.log("Server Error");
+  }
+};
+startServer();
