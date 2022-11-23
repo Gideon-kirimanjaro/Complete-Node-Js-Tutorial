@@ -10,14 +10,16 @@ const Task = (props) => {
   const [itemTask, setItemTask] = useState("");
   const [itemTime, setItemTime] = useState("");
   const [update, setupdate] = useState(false);
+  const [taskCompleted, setTaskCompleted] = useState(false);
   const fetchTask = useCallback(() => {
     fetch(`http://localhost:4500/api/tasks/${params.taskId}`)
       .then((response) => response.json())
       .then((data) => {
         data.map((item) => {
-          const { taskName, taskTime } = item;
+          const { taskName, taskTime, completed } = item;
           setItemTask(taskName);
           setItemTime(taskTime);
+          setTaskCompleted(completed);
         });
       });
   }, [params.taskId]);
@@ -30,11 +32,15 @@ const Task = (props) => {
   const timeHandler = (e) => {
     setItemTime(e.target.value);
   };
+  const handleCheck = () => {
+    setTaskCompleted(!taskCompleted);
+  };
   const updateApi = async () => {
     await axios
       .put(`http://localhost:4500/api/tasks/${params.taskId}`, {
         taskName: itemTask,
         taskTime: itemTime,
+        completed: taskCompleted,
       })
       .then(
         setTimeout(() => {
@@ -45,19 +51,24 @@ const Task = (props) => {
   };
   const updateTask = () => {
     updateApi();
-    props.liftState({ itemTask, itemTime });
+    props.liftState({ itemTask, itemTime, taskCompleted });
   };
 
   return (
-    <div
-      style={{
-        width: "400px",
-        margin: "auto",
-      }}
-    >
-      <Form>
+    <div>
+      <Form
+        style={{
+          width: "400px",
+          margin: "auto",
+          padding: "30px",
+          border: "1px solid green",
+          borderRadius: "20px 20px",
+          backgroundColor: "whitesmoke",
+        }}
+      >
+        <p>Task id: {params.taskId}</p>
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-          <Form.Label>Task id: {params.taskId}</Form.Label>
+          <Form.Label>Task</Form.Label>
           <Form.Control
             type="text"
             value={itemTask}
@@ -73,10 +84,19 @@ const Task = (props) => {
             autoFocus
             onChange={timeHandler}
           />
+          <Form.Check type="checkbox" id="custom-switch" className="mt-2">
+            <Form.Check.Input
+              type="checkbox"
+              isValid
+              checked={taskCompleted}
+              onChange={handleCheck}
+            />{" "}
+            <Form.Check.Label style={{ color: "black", fontWeight: "bold" }}>
+              Task Completed
+            </Form.Check.Label>
+          </Form.Check>
         </Form.Group>
-        <Button variant="warning" className="mx-2">
-          <Link to="/home">Back to Tasks</Link>
-        </Button>
+
         <Button
           disabled={itemTask.length < 1 || itemTime < 1}
           variant="primary"
@@ -85,8 +105,20 @@ const Task = (props) => {
           {" "}
           Update Task
         </Button>
+        <div>
+          {update ? (
+            <p style={{ color: "green", fontWeight: "bold" }}>
+              Updated Successfully!
+            </p>
+          ) : null}
+        </div>
       </Form>
-      <div>{update ? <UpdateAlert /> : null}</div>
+
+      <Button variant="info" className="m-2">
+        <Link style={{ textDecoration: "none", color: "black" }} to="/">
+          Back to Tasks
+        </Link>
+      </Button>
     </div>
   );
 };

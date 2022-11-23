@@ -43,19 +43,20 @@ function App() {
     fetchData,
     rerender.itemTask,
     rerender.itemTime,
+    rerender.taskCompleted,
     deleteRender,
     postRender,
   ]);
   return (
     <div className="App">
       <h1>AN EXPRESS APP</h1>
-      <NavLink to="home" className="px-2">
+      <NavLink to="/" className="px-2">
         Home
       </NavLink>
       <NavLink to="about">About</NavLink>
       <Routes>
         <Route
-          path="/home"
+          path="/"
           element={
             <Home
               data={data}
@@ -65,6 +66,7 @@ function App() {
           }
         />
         <Route path="/about" element={<About />} />
+
         <Route
           path="/task/:taskId"
           element={<Task liftState={liftHandler} />}

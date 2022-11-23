@@ -5,7 +5,7 @@ const getTasks = (req, res) => {
 };
 const postTasks = (req, res) => {
   const id = crypto.randomBytes(16).toString("hex");
-  tasks.push({ ...req.body, id: id });
+  tasks.push({ ...req.body, completed: false, id: id });
   res.status(200).json(tasks);
 };
 const getTask = (req, res) => {
@@ -32,7 +32,7 @@ const getTask = (req, res) => {
 };
 const updateTask = (req, res) => {
   const { key } = req.params;
-  const { taskName, taskTime } = req.body;
+  const { taskName, taskTime, completed } = req.body;
   const exists = tasks.find((item) => {
     return item.id === key;
   });
@@ -41,6 +41,7 @@ const updateTask = (req, res) => {
       if (item.id === key) {
         item.taskName = taskName;
         item.taskTime = taskTime;
+        item.completed = completed;
         return res.json(tasks);
       }
     });

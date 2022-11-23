@@ -14,7 +14,7 @@ function TaskComponent({ id, task, time, children, onEdit, onDelete }) {
     >
       <thead>
         <tr>
-          <th>#</th>
+          <th>complete</th>
           <th>Task</th>
           <th>Time</th>
           <th>edit</th>

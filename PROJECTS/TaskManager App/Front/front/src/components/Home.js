@@ -28,16 +28,34 @@ const Home = (props) => {
           data.map((item, index) => {
             return (
               <tr key={index}>
-                <td></td>
-                <td>{item.taskName}</td>
+                <td>
+                  {" "}
+                  {item.completed === true ? (
+                    <p> ✔ complete</p>
+                  ) : (
+                    <p> ❌ incomplete</p>
+                  )}
+                </td>
+                <td
+                  style={
+                    item.completed === true
+                      ? { textDecoration: "line-through" }
+                      : null
+                  }
+                >
+                  {item.taskName}
+                </td>
                 <td>{item.taskTime}</td>
                 <td>
-                  {/* <CustomModal
-                    task={item.taskName}
-                    time={item.taskTime}
-                    id={item.id}
-                  /> */}
-                  <Link to={`/task/${item.id}`}>Edit</Link>
+                  <Button>
+                    {" "}
+                    <Link
+                      style={{ textDecoration: "none", color: "black" }}
+                      to={`/task/${item.id}`}
+                    >
+                      Edit
+                    </Link>
+                  </Button>
                 </td>
                 <td>
                   <Button
