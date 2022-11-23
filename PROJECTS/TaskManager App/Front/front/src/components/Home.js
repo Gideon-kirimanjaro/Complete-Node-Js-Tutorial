@@ -11,7 +11,6 @@ import CustomModal from "./Ui/Modal/CustomModal";
 const Home = (props) => {
   const { data } = props;
   const deleteTaskHandler = (id) => {
-    alert("Are you sure you want to delete?");
     axios.delete(`http://localhost:4500/api/tasks/${id}`);
     props.deleteRender(id);
   };
@@ -51,7 +50,7 @@ const Home = (props) => {
                     {" "}
                     <Link
                       style={{ textDecoration: "none", color: "black" }}
-                      to={`/task/${item.id}`}
+                      to={`/task/${item._id}`}
                     >
                       Edit
                     </Link>
@@ -61,7 +60,7 @@ const Home = (props) => {
                   <Button
                     variant="danger"
                     onClick={() => {
-                      deleteTaskHandler(item.id);
+                      deleteTaskHandler(item._id);
                     }}
                   >
                     delete

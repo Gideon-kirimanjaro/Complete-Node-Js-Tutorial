@@ -49,11 +49,11 @@ function App() {
   ]);
   return (
     <div className="App">
-      <h1>AN EXPRESS APP</h1>
-      <NavLink to="/" className="px-2">
+      <h1>Task Manager</h1>
+      {/* <NavLink to="/" className="px-2">
         Home
       </NavLink>
-      <NavLink to="about">About</NavLink>
+      <NavLink to="about">About</NavLink> */}
       <Routes>
         <Route
           path="/"

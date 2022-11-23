@@ -10,17 +10,17 @@ const Task = (props) => {
   const [itemTask, setItemTask] = useState("");
   const [itemTime, setItemTime] = useState("");
   const [update, setupdate] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [taskCompleted, setTaskCompleted] = useState(false);
   const fetchTask = useCallback(() => {
     fetch(`http://localhost:4500/api/tasks/${params.taskId}`)
       .then((response) => response.json())
       .then((data) => {
-        data.map((item) => {
-          const { taskName, taskTime, completed } = item;
-          setItemTask(taskName);
-          setItemTime(taskTime);
-          setTaskCompleted(completed);
-        });
+        console.log("Data", data);
+        const { taskName, taskTime, completed } = data;
+        setItemTask(taskName);
+        setItemTime(taskTime);
+        setTaskCompleted(completed);
       });
   }, [params.taskId]);
   useEffect(() => {
@@ -36,22 +36,25 @@ const Task = (props) => {
     setTaskCompleted(!taskCompleted);
   };
   const updateApi = async () => {
+    setLoader(true);
     await axios
       .put(`http://localhost:4500/api/tasks/${params.taskId}`, {
         taskName: itemTask,
         taskTime: itemTime,
         completed: taskCompleted,
       })
-      .then(
-        setTimeout(() => {
+      .then(props.liftState({ itemTask, itemTime, taskCompleted }))
+      .then((response) => {
+        if (response.status === 200) {
           setupdate(true);
-        }, 100)
-      )
+        }
+        console.log(response);
+      })
       .then(setupdate(false));
+    setLoader(false);
   };
   const updateTask = () => {
     updateApi();
-    props.liftState({ itemTask, itemTime, taskCompleted });
   };
 
   return (
@@ -106,6 +109,7 @@ const Task = (props) => {
           Update Task
         </Button>
         <div>
+          {loader && <p style={{ color: "green" }}>Updating...</p>}
           {update ? (
             <p style={{ color: "green", fontWeight: "bold" }}>
               Updated Successfully!

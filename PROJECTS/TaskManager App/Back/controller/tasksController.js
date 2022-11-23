@@ -37,34 +37,33 @@ const getTask = async (req, res) => {
 };
 const updateTask = async (req, res) => {
   const { key } = req.params;
-  const { taskName, taskTime, completed } = req.body;
   try {
-    await Tasks.updateOne({
-      taskName: taskName,
-      taskTime: taskTime,
-      completed: completed,
+    const task = await Tasks.findOneAndUpdate({ _id: key }, req.body, {
+      new: true,
+      runvalidators: true,
     });
+    if (!task) {
+      return res.json(404).json(`Task with id ${key} does not exist`);
+    }
+    res.status(200).json({ task });
   } catch (error) {
     res.json({
       msg: error,
     });
   }
 };
-const deleteTask = (req, res) => {
+const deleteTask = async (req, res) => {
   const { key } = req.params;
-  const exists = tasks.find((item) => {
-    return item.id === key;
-  });
-  if (exists) {
-    const newTasks = tasks.map((item) => {
-      if (item.id === key) {
-        const index = tasks.indexOf(item.id);
-        tasks.splice(index, 1);
-        return res.json(tasks);
-      }
+  try {
+    const task = await Tasks.findOneAndDelete({ _id: key });
+    if (!task) {
+      return res.status(404).json(`A task with id ${key} does not exist`);
+    }
+    res.status(200).json({ task });
+  } catch (error) {
+    res.status(500).json({
+      msg: error,
     });
-  } else {
-    return res.send("Key does not exist");
   }
 };
 module.exports = {
